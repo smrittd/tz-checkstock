@@ -1,0 +1,69 @@
+name: checkstock
+
+services:
+  db:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-checkstock}
+      POSTGRES_USER: ${POSTGRES_USER:-checkstock}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-checkstock}
+    ports:
+      - "127.0.0.1:${POSTGRES_PORT:-5433}:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB"]
+      interval: 3s
+      timeout: 3s
+      retries: 15
+
+  api:
+    build:
+      context: ./backend
+      target: runtime
+    environment:
+      DATABASE_URL: postgresql+asyncpg://${POSTGRES_USER:-checkstock}:${POSTGRES_PASSWORD:-checkstock}@db:5432/${POSTGRES_DB:-checkstock}
+      SEED_DEMO: ${SEED_DEMO:-true}
+    ports:
+      - "127.0.0.1:${API_PORT:-8000}:8000"
+    depends_on:
+      db:
+        condition: service_healthy
+
+  web:
+    build: ./frontend
+    ports:
+      - "127.0.0.1:${WEB_PORT:-8080}:80"
+    depends_on:
+      api:
+        condition: service_healthy
+
+  test-db:
+    profiles: [test]
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_DB: checkstock_test
+      POSTGRES_USER: test
+      POSTGRES_PASSWORD: test
+    tmpfs:
+      - /var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U test -d checkstock_test"]
+      interval: 2s
+      timeout: 3s
+      retries: 15
+
+  tests:
+    profiles: [test]
+    build:
+      context: ./backend
+      target: test
+    environment:
+      DATABASE_URL: postgresql+asyncpg://test:test@test-db:5432/checkstock_test
+      TEST_DATABASE_URL: postgresql+asyncpg://test:test@test-db:5432/checkstock_test
+    depends_on:
+      test-db:
+        condition: service_healthy
+
+volumes:
+  postgres_data:

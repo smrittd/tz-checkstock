@@ -1,0 +1,56 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.eggs/
+.venv/
+venv/
+env/
+build/
+dist/
+
+# Tests, coverage and code quality tools
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.tox/
+.nox/
+.coverage
+.coverage.*
+htmlcov/
+coverage.xml
+coverage/
+playwright-report/
+test-results/
+
+# Frontend
+node_modules/
+.vite/
+*.tsbuildinfo
+
+# Local environment and secrets (keep example configs)
+.env
+.env.*
+!.env.example
+!.env.*.example
+
+# Local database files and Docker volume directories
+*.db
+*.sqlite
+*.sqlite3
+pgdata/
+postgres-data/
+
+# Editors and operating systems
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db
+Desktop.ini
+*.swp
+*.swo
+
+# Temporary files and logs
+tmp/
+temp/
+*.log
