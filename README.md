@@ -101,3 +101,4 @@ docker compose --profile test down
 docker compose --profile test down -v
 docker compose up --build -d --wait
 ```
+Видео есть в папке репозитория "видео демонстрация" 
